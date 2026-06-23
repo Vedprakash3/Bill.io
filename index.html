@@ -26,40 +26,14 @@
         .category { margin-bottom: 20px; }
         .cat-title { background: linear-gradient(90deg, #E91E63, #F06292); color: white; padding: 6px 10px; font-size: 16px; font-weight: bold; margin-bottom: 8px; border-radius: 5px; }
 
-        .item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 14px;
-            padding: 8px 5px;
-            border-bottom: 1px dotted #999;
-        }
-        .item:last-child { border-bottom: none; }
+        .item { display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 8px 5px; border-bottom: 1px dotted #999; }
         .item-info { flex: 1; }
         .item-name { color: #212121; font-weight: 500; }
         .item-price { color: #D32F2F; font-weight: bold; font-size: 13px; }
 
         .qty-control { display: flex; align-items: center; gap: 8px; }
-        .qty-btn {
-            background: #E91E63;
-            color: white;
-            border: none;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 16px;
-        }
-        .qty-btn:hover { background: #C2185B; }
-        .qty-input {
-            width: 40px;
-            text-align: center;
-            border: 1px solid #E91E63;
-            border-radius: 5px;
-            padding: 4px;
-            font-weight: bold;
-        }
+        .qty-btn { background: #E91E63; color: white; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-weight: bold; font-size: 16px; }
+        .qty-input { width: 40px; text-align: center; border: 1px solid #E91E63; border-radius: 5px; padding: 4px; font-weight: bold; }
 
         .bill-header { text-align: center; padding: 15px; background: #FCE4EC; }
         .bill-header h2 { color: #C2185B; font-size: 24px; }
@@ -70,50 +44,18 @@
         .bill-table .qty { text-align: center; }
         .bill-table .amount { text-align: right; font-weight: bold; }
 
-        .total-section {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 2px dashed #E91E63;
-        }
-        .grand-total {
-            font-size: 18px;
-            font-weight: bold;
-            color: #C2185B;
-            background: #FCE4EC;
-            padding: 10px;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-        }
+        .total-section { margin-top: 15px; padding-top: 15px; border-top: 2px dashed #E91E63; }
+        .grand-total { font-size: 18px; font-weight: bold; color: #C2185B; background: #FCE4EC; padding: 10px; border-radius: 5px; display: flex; justify-content: space-between; }
 
         .action-btns { display: flex; gap: 10px; margin-top: 20px; }
-        .btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+        .btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-clear { background: #757575; color: white; }
-        .btn-clear:hover { background: #616161; }
         .btn-download { background: #2E7D32; color: white; }
-        .btn-download:hover { background: #1B5E20; }
 
         .customer-info { margin-bottom: 15px; }
-        .customer-info input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #E91E63;
-            border-radius: 5px;
-            margin-bottom: 8px;
-        }
+        .customer-info input { width: 100%; padding: 8px; border: 1px solid #E91E63; border-radius: 5px; margin-bottom: 8px; }
 
-        @media (max-width: 968px) {
-            .container { grid-template-columns: 1fr; }
-            .menu-body { max-height: 50vh; }
-        }
+        @media (max-width: 968px) { .container { grid-template-columns: 1fr; } .menu-body { max-height: 50vh; } }
     </style>
 </head>
 <body>
@@ -134,17 +76,15 @@
             </div>
             <div class="bill-body">
                 <div class="customer-info">
-                    <input type="text" id="customerName" placeholder="Customer Name">
-                    <input type="text" id="customerPhone" placeholder="Phone Number">
+                    <input type="text" id="customerName" placeholder="Customer Name" 
+                           onkeypress="return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123) || (event.charCode == 32)">
+                    <input type="tel" id="customerPhone" placeholder="Customer Phone Number" maxlength="10" 
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 </div>
 
                 <table class="bill-table">
                     <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th class="qty" style="text-align: center;">Qty</th>
-                            <th class="amount" style="text-align: right;">Amount</th>
-                        </tr>
+                        <tr><th>Item</th><th class="qty" style="text-align: center;">Qty</th><th class="amount" style="text-align: right;">Amount</th></tr>
                     </thead>
                     <tbody id="billItems">
                         <tr><td colspan="3" style="text-align: center; color: #999;">No items added</td></tr>
@@ -160,7 +100,7 @@
 
                 <div class="action-btns">
                     <button class="btn btn-clear" onclick="clearBill()">Clear</button>
-                    <button class="btn btn-download" id="downloadBtn" onclick="downloadBill()">📥 View Bill</button>
+                    <button class="btn btn-download" onclick="downloadBill()">📥 View Bill</button>
                 </div>
             </div>
         </div>
@@ -200,7 +140,6 @@
         function renderMenu() {
             const menuList = document.getElementById('menuList');
             const categories = [...new Set(menuItems.map(item => item.category))];
-
             menuList.innerHTML = categories.map(cat => `
                 <div class="category">
                     <div class="cat-title">${cat}</div>
@@ -224,10 +163,8 @@
         function updateQty(id, change) {
             const item = menuItems.find(i => i.id === id);
             if (!cart[id]) cart[id] = {...item, qty: 0 };
-
             cart[id].qty = Math.max(0, cart[id].qty + change);
             if (cart[id].qty === 0) delete cart[id];
-
             document.getElementById(`qty-${id}`).value = cart[id]?.qty || 0;
             renderBill();
         }
@@ -235,55 +172,43 @@
         function renderBill() {
             const billItems = document.getElementById('billItems');
             const cartItems = Object.values(cart);
-
             if (cartItems.length === 0) {
                 billItems.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #999;">No items added</td></tr>';
                 document.getElementById('grandTotal').textContent = '₹0';
                 return;
             }
-
             let total = 0;
             billItems.innerHTML = cartItems.map(item => {
                 const amount = item.price * item.qty;
                 total += amount;
-                return `
-                    <tr>
-                        <td>${item.name}</td>
-                        <td class="qty" style="text-align: center;">${item.qty}</td>
-                        <td class="amount" style="text-align: right;">₹${amount}</td>
-                    </tr>
-                `;
+                return `<tr><td>${item.name}</td><td class="qty" style="text-align: center;">${item.qty}</td><td class="amount" style="text-align: right;">₹${amount}</td></tr>`;
             }).join('');
-
             document.getElementById('grandTotal').textContent = `₹${total}`;
         }
 
         function clearBill() {
             cart = {};
-            menuItems.forEach(item => {
-                const input = document.getElementById(`qty-${item.id}`);
-                if (input) input.value = 0;
-            });
+            menuItems.forEach(item => { const input = document.getElementById(`qty-${item.id}`); if (input) input.value = 0; });
             document.getElementById('customerName').value = '';
             document.getElementById('customerPhone').value = '';
             renderBill();
         }
 
         function downloadBill() {
-            if (Object.keys(cart).length === 0) {
-                alert('Please add items to bill first!');
-                return;
-            }
+            const name = document.getElementById('customerName').value.trim();
+            const phone = document.getElementById('customerPhone').value.trim();
 
-            const name = document.getElementById('customerName').value || 'Customer';
-            const phone = document.getElementById('customerPhone').value || 'N/A';
+            if (Object.keys(cart).length === 0) { alert('Please add items to bill first!'); return; }
+            if (name === "") { alert('Please enter Customer Name!'); return; }
+            if (phone.length < 10) { alert('Please enter a valid 10-digit Phone Number!'); return; }
+
             const date = new Date().toLocaleDateString('en-IN');
             const billNo = Date.now().toString().slice(-6);
             const total = document.getElementById('grandTotal').textContent;
 
             const printWindow = window.open('', '_blank', 'height=700,width=900');
             
-            const billHTML = `
+            printWindow.document.write(`
                 <html>
                 <head>
                     <title>Bill-${billNo}</title>
@@ -291,102 +216,47 @@
                     <style>
                         body { font-family: Arial, sans-serif; padding: 20px; color: #000; background: #f4f4f4; }
                         .action-bar { max-width: 190mm; margin: 0 auto 15px auto; display: flex; gap: 15px; }
-                        .action-btn { flex: 1; padding: 12px; font-size: 15px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; text-align: center; color: white; transition: 0.2s; }
-                        .btn-pdf { background-color: #2E7D32; }
-                        .btn-pdf:hover { background-color: #1B5E20; }
-                        
-                        .bill-container { max-width: 190mm; margin: 0 auto; border: 1px solid #ccc; padding: 30px; box-shadow: 0 0 10px rgba(0,0,0,0.05); background: #fff; }
-                        .text-center { text-align: center; }
-                        .text-right { text-align: right; }
-                        .header { border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 20px; }
-                        .header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; }
-                        .header p { margin: 5px 0; font-size: 14px; color: #333; }
-                        .info-table, .items-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-                        .info-table td { padding: 6px 0; }
-                        .items-table { margin-top: 20px; }
-                        .items-table th { border-bottom: 2px solid #000; background: #f8f9fa; padding: 10px; text-align: left; font-weight: bold; }
+                        .action-btn { flex: 1; padding: 12px; font-size: 15px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; text-align: center; color: white; background-color: #2E7D32; }
+                        .bill-container { max-width: 190mm; margin: 0 auto; border: 1px solid #ccc; padding: 30px; background: #fff; }
+                        .header { border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 20px; text-align: center; }
+                        .info-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+                        .items-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        .items-table th { border-bottom: 2px solid #000; padding: 10px; text-align: left; }
                         .items-table td { padding: 10px; border-bottom: 1px dashed #ddd; }
                         .total-div { margin-top: 25px; text-align: right; font-size: 20px; border-top: 2px solid #000; padding-top: 12px; font-weight: bold; }
                         .footer { margin-top: 50px; text-align: center; font-size: 14px; border-top: 1px dotted #999; padding-top: 15px; }
-                        
-                        @media print {
-                            .action-bar { display: none !important; }
-                            body { padding: 0; background: #fff; }
-                            .bill-container { border: none; box-shadow: none; padding: 0; }
-                        }
                     </style>
                 </head>
                 <body>
-                    <div class="action-bar">
-                        <button class="action-btn btn-pdf" onclick="generatePDF()">📥 Download PDF</button>
-                    </div>
-
+                    <div class="action-bar"><button class="action-btn" onclick="generatePDF()">📥 Download PDF</button></div>
                     <div class="bill-container" id="printable-bill">
-                        <div class="header text-center">
+                        <div class="header">
                             <h1>GUPTA KITCHEN</h1>
                             <p>Shop No. 12, Gali No 5, Near Hanuman Mandir, Andheri West, Mumbai - 400058</p>
-                            <p><strong>Mob: +91 98765 43210</strong></p>
+                            <p><strong>Owner Mob: +91 98765 43210</strong></p>
                         </div>
-
                         <table class="info-table">
-                            <tr>
-                                <td><strong>Bill No:</strong> ${billNo}</td>
-                                <td class="text-right"><strong>Date:</strong> ${date}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Customer:</strong> ${name}</td>
-                                <td class="text-right"><strong>Phone:</strong> ${phone}</td>
-                            </tr>
+                            <tr><td><strong>Bill No:</strong> ${billNo}</td><td style="text-align:right"><strong>Date:</strong> ${date}</td></tr>
+                            <tr><td><strong>Customer Name:</strong> ${name}</td><td style="text-align:right"><strong>Customer Phone:</strong> ${phone}</td></tr>
                         </table>
-
                         <table class="items-table">
-                            <thead>
-                                <tr>
-                                    <th>Item</th>
-                                    <th style="text-align: center; width: 15%;">Qty</th>
-                                    <th class="text-right" style="width: 20%;">Rate</th>
-                                    <th class="text-right" style="width: 20%;">Amount</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Item</th><th style="text-align:center">Qty</th><th style="text-align:right">Amount</th></tr></thead>
                             <tbody>
-                                ${Object.values(cart).map(item => `
-                                    <tr>
-                                        <td>${item.name}</td>
-                                        <td style="text-align: center;">${item.qty}</td>
-                                        <td class="text-right">₹${item.price}</td>
-                                        <td class="text-right">₹${item.price * item.qty}</td>
-                                    </tr>
-                                `).join('')}
+                                ${Object.values(cart).map(item => `<tr><td>${item.name}</td><td style="text-align:center">${item.qty}</td><td style="text-align:right">₹${item.price * item.qty}</td></tr>`).join('')}
                             </tbody>
                         </table>
-
-                        <div class="total-div">
-                            GRAND TOTAL: ${total}
-                        </div>
-
-                        <div class="footer">
-                            <p>Thank you! Visit Again 🙏</p>
-                        </div>
+                        <div class="total-div">GRAND TOTAL: ${total}</div>
+                        <div class="footer"><p>Thank you! Visit Again 🙏</p></div>
                     </div>
-
                     <script>
                         function generatePDF() {
                             const element = document.getElementById('printable-bill');
-                            const opt = {
-                                margin:       10,
-                                filename:     'GuptaKitchen-Bill-${billNo}.pdf',
-                                image:        { type: 'jpeg', quality: 0.98 },
-                                html2canvas:  { scale: 2, useCORS: true },
-                                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                            };
-                            html2pdf().set(opt).from(element).save();
+                            html2pdf().from(element).save('GuptaKitchen-Bill-${billNo}.pdf');
                         }
                     <\/script>
                 </body>
                 </html>
-            `;
-
-            printWindow.document.write(billHTML);
+            `);
             printWindow.document.close();
         }
 
