@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gupta Kitchen - Billing</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
+        body { background: #FFF8E1; padding: 15px; }
+
+        .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 20px; }
+
+        .menu-section, .bill-section {
+            background: white;
+            border: 4px double #E91E63;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .header { text-align: center; padding: 20px; background: #FCE4EC; }
+        .header h1 { font-size: 32px; color: #C2185B; margin-bottom: 5px; }
+        .pure-veg { background: #2E7D32; color: white; display: inline-block; padding: 4px 12px; border-radius: 15px; font-size: 12px; }
+        .address { font-size: 12px; color: #5D4037; margin-top: 6px; font-weight: bold; }
+
+        .menu-body { padding: 15px; max-height: 80vh; overflow-y: auto; }
+        .category { margin-bottom: 20px; }
+        .cat-title { background: linear-gradient(90deg, #E91E63, #F06292); color: white; padding: 6px 10px; font-size: 16px; font-weight: bold; margin-bottom: 8px; border-radius: 5px; }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            padding: 8px 5px;
+            border-bottom: 1px dotted #999;
+        }
+        .item:last-child { border-bottom: none; }
+        .item-info { flex: 1; }
+        .item-name { color: #212121; font-weight: 500; }
+        .item-price { color: #D32F2F; font-weight: bold; font-size: 13px; }
+
+        .qty-control { display: flex; align-items: center; gap: 8px; }
+        .qty-btn {
+            background: #E91E63;
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .qty-btn:hover { background: #C2185B; }
+        .qty-input {
+            width: 40px;
+            text-align: center;
+            border: 1px solid #E91E63;
+            border-radius: 5px;
+            padding: 4px;
+            font-weight: bold;
+        }
+
+        .bill-header { text-align: center; padding: 15px; background: #FCE4EC; }
+        .bill-header h2 { color: #C2185B; font-size: 24px; }
+        .bill-body { padding: 15px; }
+        .bill-table { width: 100%; font-size: 13px; border-collapse: collapse; }
+        .bill-table th { background: #E91E63; color: white; padding: 8px 5px; text-align: left; }
+        .bill-table td { padding: 6px 5px; border-bottom: 1px solid #eee; }
+        .bill-table .qty { text-align: center; }
+        .bill-table .amount { text-align: right; font-weight: bold; }
+
+        .total-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px dashed #E91E63;
+        }
+        .grand-total {
+            font-size: 18px;
+            font-weight: bold;
+            color: #C2185B;
+            background: #FCE4EC;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .action-btns { display: flex; gap: 10px; margin-top: 20px; }
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-clear { background: #757575; color: white; }
+        .btn-clear:hover { background: #616161; }
+        .btn-download { background: #2E7D32; color: white; }
+        .btn-download:hover { background: #1B5E20; }
+
+        .customer-info { margin-bottom: 15px; }
+        .customer-info input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #E91E63;
+            border-radius: 5px;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 968px) {
+            .container { grid-template-columns: 1fr; }
+            .menu-body { max-height: 50vh; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="menu-section">
+            <div class="header">
+                <h1>GUPTA KITCHEN</h1>
+                <div class="pure-veg">100% PURE VEG</div>
+                <p class="address">📍 Shop No. 12, Gali No 5, Near Hanuman Mandir, Andheri West, Mumbai - 400058</p>
+            </div>
+            <div class="menu-body" id="menuList"></div>
+        </div>
+
+        <div class="bill-section" id="billSection">
+            <div class="bill-header">
+                <h2>🧾 BILL</h2>
+                <p id="billDate" style="font-size: 12px; color: #666;"></p>
+            </div>
+            <div class="bill-body">
+                <div class="customer-info">
+                    <input type="text" id="customerName" placeholder="Customer Name">
+                    <input type="text" id="customerPhone" placeholder="Phone Number">
+                </div>
+
+                <table class="bill-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th class="qty" style="text-align: center;">Qty</th>
+                            <th class="amount" style="text-align: right;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="billItems">
+                        <tr><td colspan="3" style="text-align: center; color: #999;">No items added</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="total-section">
+                    <div class="grand-total">
+                        <span>TOTAL:</span>
+                        <span id="grandTotal">₹0</span>
+                    </div>
+                </div>
+
+                <div class="action-btns">
+                    <button class="btn btn-clear" onclick="clearBill()">Clear</button>
+                    <button class="btn btn-download" id="downloadBtn" onclick="downloadBill()">📥 View Bill</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const menuItems = [
+            { id: 1, category: "SNACKS", name: "Idli", price: 50 },
+            { id: 2, category: "SNACKS", name: "Idli Chatni", price: 50 },
+            { id: 3, category: "SNACKS", name: "Idli Fry", price: 60 },
+            { id: 4, category: "SNACKS", name: "Dahi Idli", price: 80 },
+            { id: 5, category: "SNACKS", name: "Vada Sambhar", price: 60 },
+            { id: 6, category: "SNACKS", name: "Misal Pav", price: 60 },
+            { id: 7, category: "DOSA", name: "Sada Dosa", price: 50 },
+            { id: 8, category: "DOSA", name: "Masala Dosa", price: 60 },
+            { id: 9, category: "DOSA", name: "Butter Masala Dosa", price: 80 },
+            { id: 10, category: "DOSA", name: "Mysore Masala Dosa", price: 80 },
+            { id: 11, category: "DOSA", name: "Paper Masala Dosa", price: 100 },
+            { id: 12, category: "SPECIAL ITEMS", name: "Punjabi Samosa", price: 50 },
+            { id: 13, category: "SPECIAL ITEMS", name: "Puri Bhaji", price: 90 },
+            { id: 14, category: "SPECIAL ITEMS", name: "Panner Pakoda", price: 200 },
+            { id: 15, category: "LASSI", name: "Sweet Lassi", price: 60 },
+            { id: 16, category: "LASSI", name: "Salted Lassi", price: 60 },
+            { id: 17, category: "LASSI", name: "Butter Milk", price: 30 },
+            { id: 18, category: "BIRYANI", name: "Veg. Biryani", price: 170 },
+            { id: 19, category: "BIRYANI", name: "Paneer Biryani", price: 200 },
+            { id: 20, category: "BIRYANI", name: "Hyderabadi Biryani", price: 180 },
+            { id: 21, category: "TANDOORI", name: "Roti", price: 15 },
+            { id: 22, category: "TANDOORI", name: "Butter Roti", price: 20 },
+            { id: 23, category: "TANDOORI", name: "Butter Nan", price: 35 },
+            { id: 24, category: "LUNCH", name: "Lanch & Dinner", price: 120 },
+            { id: 25, category: "LUNCH", name: "Dal Rice", price: 80 },
+        ];
+
+        let cart = {};
+
+        function renderMenu() {
+            const menuList = document.getElementById('menuList');
+            const categories = [...new Set(menuItems.map(item => item.category))];
+
+            menuList.innerHTML = categories.map(cat => `
+                <div class="category">
+                    <div class="cat-title">${cat}</div>
+                    ${menuItems.filter(item => item.category === cat).map(item => `
+                        <div class="item">
+                            <div class="item-info">
+                                <div class="item-name">${item.name}</div>
+                                <div class="item-price">₹${item.price}/-</div>
+                            </div>
+                            <div class="qty-control">
+                                <button class="qty-btn" onclick="updateQty(${item.id}, -1)">-</button>
+                                <input type="text" class="qty-input" id="qty-${item.id}" value="0" readonly>
+                                <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+        }
+
+        function updateQty(id, change) {
+            const item = menuItems.find(i => i.id === id);
+            if (!cart[id]) cart[id] = {...item, qty: 0 };
+
+            cart[id].qty = Math.max(0, cart[id].qty + change);
+            if (cart[id].qty === 0) delete cart[id];
+
+            document.getElementById(`qty-${id}`).value = cart[id]?.qty || 0;
+            renderBill();
+        }
+
+        function renderBill() {
+            const billItems = document.getElementById('billItems');
+            const cartItems = Object.values(cart);
+
+            if (cartItems.length === 0) {
+                billItems.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #999;">No items added</td></tr>';
+                document.getElementById('grandTotal').textContent = '₹0';
+                return;
+            }
+
+            let total = 0;
+            billItems.innerHTML = cartItems.map(item => {
+                const amount = item.price * item.qty;
+                total += amount;
+                return `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td class="qty" style="text-align: center;">${item.qty}</td>
+                        <td class="amount" style="text-align: right;">₹${amount}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('grandTotal').textContent = `₹${total}`;
+        }
+
+        function clearBill() {
+            cart = {};
+            menuItems.forEach(item => {
+                const input = document.getElementById(`qty-${item.id}`);
+                if (input) input.value = 0;
+            });
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerPhone').value = '';
+            renderBill();
+        }
+
+        function downloadBill() {
+            if (Object.keys(cart).length === 0) {
+                alert('Please add items to bill first!');
+                return;
+            }
+
+            const name = document.getElementById('customerName').value || 'Customer';
+            const phone = document.getElementById('customerPhone').value || 'N/A';
+            const date = new Date().toLocaleDateString('en-IN');
+            const billNo = Date.now().toString().slice(-6);
+            const total = document.getElementById('grandTotal').textContent;
+
+            const printWindow = window.open('', '_blank', 'height=700,width=900');
+            
+            const billHTML = `
+                <html>
+                <head>
+                    <title>Bill-${billNo}</title>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; color: #000; background: #f4f4f4; }
+                        .action-bar { max-width: 190mm; margin: 0 auto 15px auto; display: flex; gap: 15px; }
+                        .action-btn { flex: 1; padding: 12px; font-size: 15px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; text-align: center; color: white; transition: 0.2s; }
+                        .btn-pdf { background-color: #2E7D32; }
+                        .btn-pdf:hover { background-color: #1B5E20; }
+                        
+                        .bill-container { max-width: 190mm; margin: 0 auto; border: 1px solid #ccc; padding: 30px; box-shadow: 0 0 10px rgba(0,0,0,0.05); background: #fff; }
+                        .text-center { text-align: center; }
+                        .text-right { text-align: right; }
+                        .header { border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 20px; }
+                        .header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; }
+                        .header p { margin: 5px 0; font-size: 14px; color: #333; }
+                        .info-table, .items-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+                        .info-table td { padding: 6px 0; }
+                        .items-table { margin-top: 20px; }
+                        .items-table th { border-bottom: 2px solid #000; background: #f8f9fa; padding: 10px; text-align: left; font-weight: bold; }
+                        .items-table td { padding: 10px; border-bottom: 1px dashed #ddd; }
+                        .total-div { margin-top: 25px; text-align: right; font-size: 20px; border-top: 2px solid #000; padding-top: 12px; font-weight: bold; }
+                        .footer { margin-top: 50px; text-align: center; font-size: 14px; border-top: 1px dotted #999; padding-top: 15px; }
+                        
+                        @media print {
+                            .action-bar { display: none !important; }
+                            body { padding: 0; background: #fff; }
+                            .bill-container { border: none; box-shadow: none; padding: 0; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="action-bar">
+                        <button class="action-btn btn-pdf" onclick="generatePDF()">📥 Download PDF</button>
+                    </div>
+
+                    <div class="bill-container" id="printable-bill">
+                        <div class="header text-center">
+                            <h1>GUPTA KITCHEN</h1>
+                            <p>Shop No. 12, Gali No 5, Near Hanuman Mandir, Andheri West, Mumbai - 400058</p>
+                            <p><strong>Mob: +91 98765 43210</strong></p>
+                        </div>
+
+                        <table class="info-table">
+                            <tr>
+                                <td><strong>Bill No:</strong> ${billNo}</td>
+                                <td class="text-right"><strong>Date:</strong> ${date}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Customer:</strong> ${name}</td>
+                                <td class="text-right"><strong>Phone:</strong> ${phone}</td>
+                            </tr>
+                        </table>
+
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th style="text-align: center; width: 15%;">Qty</th>
+                                    <th class="text-right" style="width: 20%;">Rate</th>
+                                    <th class="text-right" style="width: 20%;">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${Object.values(cart).map(item => `
+                                    <tr>
+                                        <td>${item.name}</td>
+                                        <td style="text-align: center;">${item.qty}</td>
+                                        <td class="text-right">₹${item.price}</td>
+                                        <td class="text-right">₹${item.price * item.qty}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+
+                        <div class="total-div">
+                            GRAND TOTAL: ${total}
+                        </div>
+
+                        <div class="footer">
+                            <p>Thank you! Visit Again 🙏</p>
+                        </div>
+                    </div>
+
+                    <script>
+                        function generatePDF() {
+                            const element = document.getElementById('printable-bill');
+                            const opt = {
+                                margin:       10,
+                                filename:     'GuptaKitchen-Bill-${billNo}.pdf',
+                                image:        { type: 'jpeg', quality: 0.98 },
+                                html2canvas:  { scale: 2, useCORS: true },
+                                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                            };
+                            html2pdf().set(opt).from(element).save();
+                        }
+                    <\/script>
+                </body>
+                </html>
+            `;
+
+            printWindow.document.write(billHTML);
+            printWindow.document.close();
+        }
+
+        document.getElementById('billDate').textContent = new Date().toLocaleString('en-IN');
+        renderMenu();
+    </script>
+</body>
+</html>
